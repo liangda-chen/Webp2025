@@ -21,14 +21,15 @@
   /* 平板（≥768px） */
   @media (min-width: 768px) {
     body {
-      background-color: lightblue;
+      background-color: rgb(230, 213, 173);
     }
   }
   
   /* 桌機（≥992px） */
   @media (min-width: 992px) {
     body {
-      background-color: lightgreen;
+      background-color: burlywood;
     }
   }
+  
   
