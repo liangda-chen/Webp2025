@@ -1,0 +1,182 @@
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景點觀光展覽資訊</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 您提供的表格樣式 */
+        table {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td, th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        /* 原有的分頁樣式 */
+        .pagination-info {
+            margin: 0 15px;
+            line-height: 38px;
+        }
+        
+        /* 搜尋框調整 */
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        /* 按鈕間距調整 */
+        .btn-group {
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">景點觀光展覽資訊</h1>
+        
+        <!-- 搜尋框 -->
+        <div class="search-container input-group mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="輸入名稱關鍵字..." onchange="handleSearch()">
+            <button class="btn btn-outline-secondary" type="button" onclick="handleSearch()">搜尋</button>
+        </div>
+
+        <!-- 資料表格 -->
+        <table id="csie">
+            <thead>
+                <tr>
+                    <th>名稱</th>
+                    <th>地點</th>
+                    <th>票價</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- 分頁控制 -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="btn-group">
+                <button id="prevBtn" class="btn btn-outline-primary" onclick="prevPage()">上一頁</button>
+                <span id="pageInfo" class="pagination-info">第 1 頁 / 共 1 頁</span>
+                <button id="nextBtn" class="btn btn-outline-primary" onclick="nextPage()">下一頁</button>
+            </div>
+            <button onclick="delOldData()" class="btn btn-danger">清除資料</button>
+        </div>
+    </div>
+
+</body>
+<script>
+  let allData = []; // 儲存所有原始資料
+let filteredData = []; // 儲存篩選後的資料
+let currentPage = 1;
+const itemsPerPage = 10;
+
+// 初始化載入資料
+document.addEventListener("DOMContentLoaded", async function() {
+    await loadData();
+    renderTable();
+    updatePagination();
+});
+
+// 載入資料
+async function loadData() {
+    try {
+        const response = await fetch("https://cloud.culture.tw/frontsite/trans/SearchShowAction.do?method=doFindTypeJ&category=6");
+        allData = await response.json();
+        filteredData = [...allData]; // 初始化篩選資料
+    } catch (error) {
+        console.error('載入資料失敗:', error);
+    }
+}
+
+// 渲染表格
+function renderTable() {
+    const tableBody = document.querySelector("#csie tbody");
+    tableBody.innerHTML = "";
+
+    // 計算當前頁面的資料範圍
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageData = filteredData.slice(startIndex, endIndex);
+
+    pageData.forEach(data => {
+        const row = tableBody.insertRow();
+        const showInfo = data.showInfo?.[0] || {};
+        
+        row.insertCell(0).textContent = data.title || '無資料';
+        row.insertCell(1).textContent = showInfo.location || '無資料';
+        row.insertCell(2).textContent = showInfo.price || '無資料';
+    });
+}
+
+// 更新分頁資訊
+function updatePagination() {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    document.getElementById("pageInfo").textContent = `第 ${currentPage} 頁 / 共 ${totalPages} 頁`;
+
+    // 控制按鈕狀態
+    document.getElementById("prevBtn").disabled = currentPage === 1;
+    document.getElementById("nextBtn").disabled = currentPage === totalPages || totalPages === 0;
+}
+
+// 搜尋處理
+function handleSearch() {
+    const keyword = document.getElementById("searchInput").value.toLowerCase();
+    
+    if (keyword) {
+        filteredData = allData.filter(item => 
+            item.title && item.title.toLowerCase().includes(keyword)
+        );
+    } else {
+        filteredData = [...allData]; // 重置為所有資料
+    }
+
+    currentPage = 1; // 重置為第一頁
+    renderTable();
+    updatePagination();
+}
+
+// 分頁控制
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+        updatePagination();
+    }
+}
+
+function nextPage() {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+        updatePagination();
+    }
+}
+
+// 清除資料
+function delOldData() {
+    document.querySelector("#csie tbody").innerHTML = "";
+    document.getElementById("searchInput").value = "";
+    filteredData = [...allData];
+    currentPage = 1;
+    renderTable();
+    updatePagination();
+}
+</script>
+</html>
