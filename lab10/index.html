@@ -1,0 +1,101 @@
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flickr 黑白照片牆</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0066cc;
+    }
+
+    #getImagesBtn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #getImagesBtn:hover {
+      background-color: #004d99;
+    }
+
+    #loading {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      margin: 20px 0;
+    }
+
+    #gallery {
+      column-count: 4;
+      column-gap: 15px;
+      margin-top: 20px;
+    }
+
+    .photo-container {
+      break-inside: avoid;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .photo-container:hover {
+      transform: scale(1.02);
+    }
+
+    .photo-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: grayscale(100%);
+      transition: filter 0.5s;
+    }
+
+    .photo-container img:hover {
+      filter: grayscale(0%);
+    }
+
+    @media (max-width: 1000px) {
+      #gallery {
+        column-count: 3;
+      }
+    }
+
+    @media (max-width: 700px) {
+      #gallery {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 500px) {
+      #gallery {
+        column-count: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Flickr 黑白照片牆</h1>
+  <button id="getImagesBtn">Get Images</button>
+  <div id="loading" class="loading"></div>
+  <div id="gallery"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
